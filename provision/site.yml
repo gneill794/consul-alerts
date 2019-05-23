@@ -1,20 +1,28 @@
 ---
 - hosts: all
   vars:
-       consul_version: 1.5.0
-       ansible_python_interpreter: "/usr/bin/python3"
-  gather_facts: true
+    consul_version: 1.5.0
+    ansible_python_interpreter: "/usr/bin/python3"
   become: yes
   tasks:
-    - name: Install Unzip
+    - debug: var=ansible_facts
+    - name: add consul group
+      group:
+        name: consul
+    - name: add consul user
+      user:
+        name: consul
+        comment: Consul Service User
+        group: consul
+    - name: install dependencies
       apt:
         pkg: unzip    
         update_cache: yes
-    - name: Download Consul
+    - name: fetching consul version {{ consul_version }}
       get_url:
         url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
         dest: "/tmp/consul-{{ consul_version }}_linux_amd64.zip"
-    - name: Unzip Consul
+    - name: unziping consul version {{ consul_version }}
       unarchive:
         src: "/tmp/consul-{{ consul_version }}_linux_amd64.zip"
         dest: /usr/local/bin
@@ -22,38 +30,50 @@
         group: root
         owner: root
         mode: 0755
-    - name: Create consul config directory
+    - name: copy consul systemd startup
+      copy:
+        src: consul.service
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+        mode: 0644
+    - name: create consul config directory
       file:
         dest: /etc/consul.d
         state: directory
-        owner: root
-        group: root
-        mode: 0644
-    - name: Create consul lib directory
+        owner: consul
+        group: consul
+        mode: 0700
+    - name: create consul data directory
       file:
         dest: /var/lib/consul
         state: directory
-        owner: root
-        group: root
-        mode: 0644
+        owner: consul
+        group: consul
+        mode: 0700
     - name: Generate consul configuration file
       template:
         src: config.json
         dest: /etc/consul.d/config.json
+        owner: consul
+        group: consul
+        mode: 0600
+    - name: Copy the environment template file
+      template:
+        src: consul.environment.j2
+        dest: /etc/default/consul
         owner: root
         group: root
         mode: 0644
-    - name: Copy the consul server init
-      template:
-        src: consul-server.conf.j2
-        dest: /etc/init/consul-server.conf
-        owner: root
-        group: root
-        mode: 0444
-    - name: Start server
-      service:
-        name: consul-server
-        state: restarted
+    - name: enable consul service
+      systemd:
+        name: consul
         enabled: yes
+        masked: no
+    - name: start consul service
+      systemd:
+        name: consul
+        state: restarted
+        daemon_reload: yes
     - name: Join cluster
       command: /usr/local/bin/consul join 192.168.10.10

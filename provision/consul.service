@@ -1,0 +1,14 @@
+[Unit]
+Description=consul agent
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/consul
+ExecStart=/usr/local/bin/consul agent $OPTIONS
+ExecStop=/usr/local/bin/consul leave
+ExecReload=/usr/local/bin/consul reload
+Restart=on-failure
+User=consul
+
+[Install]
+WantedBy=multi-user.target
