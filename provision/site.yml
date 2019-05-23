@@ -5,7 +5,7 @@
     ansible_python_interpreter: "/usr/bin/python3"
   become: yes
   tasks:
-    - debug: var=ansible_facts
+#    - debug: var=ansible_facts
     - name: add consul group
       group:
         name: consul
@@ -14,15 +14,15 @@
         name: consul
         comment: Consul Service User
         group: consul
-    - name: install dependencies
+    - name: install unzip
       apt:
         pkg: unzip    
         update_cache: yes
-    - name: fetching consul version {{ consul_version }}
+    - name: fetching consul {{ consul_version }}
       get_url:
         url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
         dest: "/tmp/consul-{{ consul_version }}_linux_amd64.zip"
-    - name: unziping consul version {{ consul_version }}
+    - name: unzipping consul {{ consul_version }}
       unarchive:
         src: "/tmp/consul-{{ consul_version }}_linux_amd64.zip"
         dest: /usr/local/bin
