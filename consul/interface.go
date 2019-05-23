@@ -3,31 +3,15 @@ package consul
 import (
 	"time"
 
-	notifier "github.com/AcalephStorage/consul-alerts/notifier"
+	notifier "github.com/gneill794/consul-alerts/notifier"
+	consulapi "github.com/hashicorp/consul/api"
 )
 
 // Event data from consul
-type Event struct {
-	ID            string
-	Name          string
-	Payload       []byte
-	NodeFilter    string
-	ServiceFilter string
-	TagFilter     string
-	Version       uint
-	LTime         uint
-}
+type Event = consulapi.UserEvent
 
-type Check struct {
-	Node        string
-	CheckID     string
-	Name        string
-	Status      string
-	Notes       string
-	Output      string
-	ServiceID   string
-	ServiceName string
-}
+// Check data from consul
+type Check = consulapi.HealthCheck
 
 type ConsulAlertConfig struct {
 	Checks    *ChecksConfig
@@ -71,7 +55,6 @@ type Consul interface {
 
 	EmailNotifier() *notifier.EmailNotifier
 	LogNotifier() *notifier.LogNotifier
-	InfluxdbNotifier() *notifier.InfluxdbNotifier
 	SlackNotifier() *notifier.SlackNotifier
 	MattermostNotifier() *notifier.MattermostNotifier
 	MattermostWebhookNotifier() *notifier.MattermostWebhookNotifier
@@ -126,11 +109,6 @@ func DefaultAlertConfig() *ConsulAlertConfig {
 		Path:    "/tmp/consul-notifications.log",
 	}
 
-	influxdb := &notifier.InfluxdbNotifier{
-		Enabled:    false,
-		SeriesName: "consul-alerts",
-	}
-
 	slack := &notifier.SlackNotifier{
 		Enabled:     false,
 		ClusterName: "Consul-Alerts",
@@ -177,7 +155,6 @@ func DefaultAlertConfig() *ConsulAlertConfig {
 	notifiers := &notifier.Notifiers{
 		Email:             email,
 		Log:               log,
-		Influxdb:          influxdb,
 		Slack:             slack,
 		Mattermost:        mattermost,
 		MattermostWebhook: mattermostWebhook,

@@ -10,10 +10,10 @@ import (
 
 	"encoding/json"
 
-	notifier "github.com/AcalephStorage/consul-alerts/notifier"
+	notifier "github.com/gneill794/consul-alerts/notifier"
 
-	log "github.com/AcalephStorage/consul-alerts/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	consulapi "github.com/AcalephStorage/consul-alerts/Godeps/_workspace/src/github.com/hashicorp/consul/api"
+	log "github.com/Sirupsen/logrus"
+	consulapi "github.com/hashicorp/consul/api"
 )
 
 const (
@@ -119,20 +119,6 @@ func (c *ConsulAlertClient) LoadConfig() {
 				valErr = loadCustomValue(&config.Notifiers.Log.Enabled, val, ConfigTypeBool)
 			case "consul-alerts/config/notifiers/log/path":
 				valErr = loadCustomValue(&config.Notifiers.Log.Path, val, ConfigTypeString)
-
-				// influxdb notifier config
-			case "consul-alerts/config/notifiers/influxdb/enabled":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.Enabled, val, ConfigTypeBool)
-			case "consul-alerts/config/notifiers/influxdb/host":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.Host, val, ConfigTypeString)
-			case "consul-alerts/config/notifiers/influxdb/username":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.Username, val, ConfigTypeString)
-			case "consul-alerts/config/notifiers/influxdb/password":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.Password, val, ConfigTypeString)
-			case "consul-alerts/config/notifiers/influxdb/database":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.Database, val, ConfigTypeString)
-			case "consul-alerts/config/notifiers/influxdb/series-name":
-				valErr = loadCustomValue(&config.Notifiers.Influxdb.SeriesName, val, ConfigTypeString)
 
 				// slack notfier config
 			case "consul-alerts/config/notifiers/slack/enabled":
@@ -508,10 +494,6 @@ func (c *ConsulAlertClient) EmailNotifier() *notifier.EmailNotifier {
 
 func (c *ConsulAlertClient) LogNotifier() *notifier.LogNotifier {
 	return c.config.Notifiers.Log
-}
-
-func (c *ConsulAlertClient) InfluxdbNotifier() *notifier.InfluxdbNotifier {
-	return c.config.Notifiers.Influxdb
 }
 
 func (c *ConsulAlertClient) SlackNotifier() *notifier.SlackNotifier {

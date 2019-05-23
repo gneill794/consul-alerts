@@ -13,11 +13,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/AcalephStorage/consul-alerts/consul"
-	"github.com/AcalephStorage/consul-alerts/notifier"
+	"github.com/gneill794/consul-alerts/consul"
+	"github.com/gneill794/consul-alerts/notifier"
 
-	log "github.com/AcalephStorage/consul-alerts/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/AcalephStorage/consul-alerts/Godeps/_workspace/src/github.com/docopt/docopt-go"
+	log "github.com/Sirupsen/logrus"
+	"github.com/docopt/docopt-go"
 )
 
 const version = "Consul Alerts 0.5.0"
@@ -240,7 +240,6 @@ func builtinNotifiers() map[string]notifier.Notifier {
 
 	emailNotifier := consulClient.EmailNotifier()
 	logNotifier := consulClient.LogNotifier()
-	influxdbNotifier := consulClient.InfluxdbNotifier()
 	slackNotifier := consulClient.SlackNotifier()
 	mattermostNotifier := consulClient.MattermostNotifier()
 	mattermostWebhookNotifier := consulClient.MattermostWebhookNotifier()
@@ -257,9 +256,6 @@ func builtinNotifiers() map[string]notifier.Notifier {
 	}
 	if logNotifier.Enabled {
 		notifiers[logNotifier.NotifierName()] = logNotifier
-	}
-	if influxdbNotifier.Enabled {
-		notifiers[influxdbNotifier.NotifierName()] = influxdbNotifier
 	}
 	if slackNotifier.Enabled {
 		notifiers[slackNotifier.NotifierName()] = slackNotifier
